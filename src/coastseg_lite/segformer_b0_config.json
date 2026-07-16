@@ -1,0 +1,35 @@
+{
+  "attention_probs_dropout_prob": 0.0,
+  "classifier_dropout_prob": 0.1,
+  "decoder_hidden_size": 256,
+  "depths": [2, 2, 2, 2],
+  "downsampling_rates": [1, 4, 8, 16],
+  "drop_path_rate": 0.1,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.0,
+  "hidden_sizes": [32, 64, 160, 256],
+  "image_size": 224,
+  "initializer_range": 0.02,
+  "layer_norm_eps": 0.000001,
+  "mlp_ratios": [4, 4, 4, 4],
+  "model_type": "segformer",
+  "num_attention_heads": [1, 2, 5, 8],
+  "num_channels": 3,
+  "num_encoder_blocks": 4,
+  "num_labels": 4,
+  "patch_sizes": [7, 3, 3, 3],
+  "sr_ratios": [8, 4, 2, 1],
+  "strides": [4, 2, 2, 2],
+  "id2label": {
+    "0": "water",
+    "1": "whitewater",
+    "2": "sediment",
+    "3": "other"
+  },
+  "label2id": {
+    "water": 0,
+    "whitewater": 1,
+    "sediment": 2,
+    "other": 3
+  }
+}

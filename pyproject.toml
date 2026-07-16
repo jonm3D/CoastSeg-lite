@@ -1,151 +1,36 @@
 [build-system]
-build-backend = "hatchling.build"
-requires = ["hatchling"]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
-authors = [
-  {name = " Sharon Fitzpatrick Batiste", email = "sharon.fitzpatrick23@gmail.com"},
-]
-description = "An interactive python package for satellite derived shoreline workflows"
-keywords = [
-  "coastseg",
-  "coastsat",
-  "coastal change",
-  "shoreline extraction",
-  "satellite imagery",
-  "geospatial",
-  "remote sensing",
-  "gee",
-]
-name = "coastseg"
+name = "coastseg-lite"
+version = "0.1.0"
+description = "Minimal pinned CoastSeg RGB SegFormer inference runtime"
 readme = "README.md"
-version = "2.0.3"
-#these dependencies are the core dependencies of the package necessary for the coastsat workflow and the core functionality. Pixi reads these as pypi dependencies
-classifiers = [
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3 :: Only",
-  "Topic :: Scientific/Engineering :: GIS",
-  "Natural Language :: English",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-]
-dependencies = [
-  "aiohttp",
-  "onnxruntime",
-  "chardet",
-  "dask",
-  "coastsat-package>=0.3.3",
-  "geojson",
-  "geopandas",
-  "h5py",
-  "jupyterlab>=3.0.0",
-  "leafmap",
-  "nest-asyncio",
-  "pooch",
-  "protobuf",
-  "pytmd<2.2.0",
-  "xarray",
-  "pytz",
-  "netcdf4",
-]
+requires-python = ">=3.11,<3.12"
 license = {file = "LICENSE"}
-requires-python = ">=3.10,<3.13"
-# this is needed to tell hatchling to use the src directory as the source directory for the package
-[tool.hatch.build.targets.wheel]
-packages = ["src/coastseg"]
+dependencies = [
+  "numpy==1.26.4",
+  "pillow==12.1.1",
+  "tensorflow==2.15.1",
+  "transformers==4.48.3",
+]
 
-[project.optional-dependencies]
-test = ["pytest"] # dependencies for testing
+[dependency-groups]
+dev = ["pytest>=8.3,<9"]
 
-[tool.pixi.workspace]
-channels = ["conda-forge"]
-platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+[project.scripts]
+coastseg-lite = "coastseg_lite.cli:main"
 
-[tool.pixi.pypi-dependencies]
-coastseg = {path = ".", editable = true}
-
-# this tells pixi to install these packages (they are the same as the dependencies) from the conda-forge channel
-# Note: pytmd is purposely not included here because it causes conflicts when installed from conda-forge
-[tool.pixi.dependencies]
-netcdf4 = "*" # prefer to have this installed from conda-forge because it can cause conflicts on MacOS when installed from pip
-onnxruntime = "*"
-aiohttp = "*"
-area = "*"
-chardet = "*"
-dask = "*"
-gdal = "*"
-geojson = "*"
-geopandas = "*"
-ipyfilechooser = ">=0.6.0,<0.7"
-ipyleaflet = "*"
-jupyterlab = ">=3.0.0"
-leafmap = "*"
-nest-asyncio = "*"
-pooch = "*"
-xarray = "*"
-pytz = "*"
-scikit-image = "*"
-
-# tells setup tools to include the code in the coastseg directory within the src directory
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.pixi.feature.test.dependencies]
-pytest = "*"
+[tool.setuptools.package-data]
+coastseg_lite = ["model_manifest.json", "segformer_b0_config.json"]
 
-[tool.pixi.tasks]
-validate_numpy = "python -c \"import numpy as np; print('NumPy version:', np.__version__); assert np.array([1, 2, 3]).sum() == 6; print('NumPy validation passed')\""
-
-[project.urls]
-"Bug Tracker" = "https://github.com/SatelliteShorelines/CoastSeg/issues"
-documentation = "https://github.com/SatelliteShorelines/CoastSeg/wiki"
-homepage = "https://github.com/SatelliteShorelines/CoastSeg"
-repository = "https://github.com/SatelliteShorelines/CoastSeg"
-
-[tool.pixi.environments]
-default = {features = [], solve-group = "default"}# default base environment with all the CoastSat workflow dependencies
-test = {features = ["test"], solve-group = "default"}# Test environment with pytest dependency
-
-[tool.pixi.feature.test.tasks]
-run_tests = "pytest tests"
-
-[tool.hatch.build]
-exclude = [
-  #  Development and CI files/folders
-  "models/**",
-  "paper/**",
-  "debug/**",
-  "debug_scripts/**",
-  "docker_files/**",
-  "old_docker/**",
-  "ci/**",
-  ".github/**",
-  ".gitignore",
-  ".gitattributes",
-  "scripts/**", # Testing and docs
-  "tests/**",
-  "docs/**", # Build-related and environment files
-  "requirements.txt",
-  "requirements_dev.txt",
-  "*pixi*",
-  "*.lock", #  Bytecode and metadata
-  "**/__pycache__/**",
-  "*.egg-info/**", # Source code and notebooks
-  "*.ipynb", # Jupyter notebooks
-  "*docker*", # Any docker-related files
-  # Data and models
-  "*.h5",
-  "*.npy",
-  "models/**", # Scripts
-  "0_test_download_imagery_workflow.py",
-  "1_download_imagery.py",
-  "2_extract_shorelines.py",
-  "3_zoo_workflow.py",
-  "5_zoo_workflow_local_model.py",
-  "6_zoo_workflow_with_coregistration.py",
-  "7_automatic_image_sorter.py",
-  "run_image_classifier.py",
-  "run_shoreline_segmentation_classifier.py",
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+  "real_model: requires the pinned downloaded model",
 ]

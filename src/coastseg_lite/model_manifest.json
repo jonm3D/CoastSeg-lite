@@ -1,0 +1,52 @@
+{
+  "schema": "coastseg-lite.model/v1",
+  "model_id": "global_segformer_RGB_4class_14036903",
+  "implementation": "BEST",
+  "best_model": "Global_4class_rgb_512_v2_segformer_fullmodel.h5",
+  "source": {
+    "repository": "2320sharon/global_segformer_RGB_4class_14036903",
+    "revision": "4882d70f4952ab4f38d396d2a37d1b6f4f4a0e68",
+    "doi": "10.5281/zenodo.14036903"
+  },
+  "architecture": {
+    "repository": "nvidia/mit-b0",
+    "revision": "80983a413c30d36a39c20203974ae7807835e2b4",
+    "source_config_sha256": "e2378ac7c7a6981d6bdd1d9ccf29b611264c382afce89c561f39c9291164ff",
+    "bundled_config": "segformer_b0_config.json",
+    "bundled_config_sha256": "d6a2b6f8e9fd12f094eb023e427afe15d2b82b551296c5f57d5c38ed2a7d1bb5"
+  },
+  "input": {
+    "image_type": "RGB",
+    "dtype": "uint8",
+    "channels": 3,
+    "target_size": [512, 512]
+  },
+  "classes": {
+    "0": "water",
+    "1": "whitewater",
+    "2": "sediment",
+    "3": "other"
+  },
+  "files": [
+    {
+      "name": "BEST_MODEL.txt",
+      "bytes": 47,
+      "sha256": "a9055f05231b3232b6a154a47d80a1b150de39168254055158bd56b06a7215db"
+    },
+    {
+      "name": "Global_4class_rgb_512_v2_modelcard.json",
+      "bytes": 1560,
+      "sha256": "ff2d967d25647ded11ebf91878806390df3badf02e10adb5f05e2235f90ea49a"
+    },
+    {
+      "name": "Global_4class_rgb_512_v2_segformer.json",
+      "bytes": 1024,
+      "sha256": "35c2b97fbe93d4958ebc35515930ed1a994a003ec1ee553834934d6810bebdbf"
+    },
+    {
+      "name": "Global_4class_rgb_512_v2_segformer_fullmodel.h5",
+      "bytes": 15135608,
+      "sha256": "00661505e28e0bc48a36574f2a73064e50b968c2c3fa3789a6db3bac27440ebf"
+    }
+  ]
+}
