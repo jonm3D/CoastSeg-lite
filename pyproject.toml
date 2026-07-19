@@ -4,14 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "coastseg-lite"
-version = "0.1.0"
+version = "0.2.0"
 description = "Minimal pinned CoastSeg RGB SegFormer inference runtime"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 license = {file = "LICENSE"}
 dependencies = [
+  "astropy>=6.1,<8",
   "numpy==1.26.4",
   "pillow==12.1.1",
+  "scikit-image>=0.24,<0.26",
+  "scipy>=1.14,<1.17",
   "tensorflow==2.15.1",
   "transformers==4.48.3",
 ]
