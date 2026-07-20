@@ -5,6 +5,7 @@ from coastseg_lite.shoreline import (
     create_shoreline_buffer,
     extract_shoreline,
     merge_classes,
+    minimum_area_pixels,
     pixel_to_world,
     world_to_pixel,
 )
@@ -26,6 +27,11 @@ def test_merge_classes_uses_water_and_whitewater():
     )
 
 
+def test_minimum_area_is_resolution_aware():
+    assert minimum_area_pixels(1000.0, (0, 10, 0, 0, 0, -10)) == 10
+    assert minimum_area_pixels(1000.0, (0, 3, 0, 0, 0, -3)) == 112
+
+
 def test_reference_buffer_is_continuous_for_sparse_line():
     reference = np.array([[5.0, 10.0], [5.0, 1.0]])
     buffer = create_shoreline_buffer((10, 10), GEOREF, reference, 1.0, 1.0)
@@ -37,7 +43,7 @@ def test_extract_vertical_binary_shoreline():
     labels[:, 5:] = 0
     clear = np.zeros_like(labels, dtype=bool)
     settings = ShorelineSettings(
-        min_beach_area_pixels=1,
+        min_beach_area_m2=1.0,
         max_dist_ref_m=2.0,
         min_length_sl_m=5.0,
         dist_clouds_m=0.0,

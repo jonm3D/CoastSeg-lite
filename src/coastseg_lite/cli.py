@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
 import json
 from pathlib import Path
 from datetime import datetime
@@ -113,7 +114,7 @@ def _run_shoreline(args: argparse.Namespace) -> int:
     labels = np.load(args.classes, allow_pickle=False)
     reference = np.load(args.reference, allow_pickle=False)
     settings = ShorelineSettings(
-        min_beach_area_pixels=args.min_beach_area_pixels,
+        min_beach_area_m2=args.min_beach_area_m2,
         max_dist_ref_m=args.max_dist_ref,
         min_length_sl_m=args.min_length,
         dist_clouds_m=args.dist_clouds,
@@ -195,7 +196,14 @@ def _run_slopes(args: argparse.Namespace) -> int:
     result = estimate_slopes(dates, cross_distance, tide["tide_level"], settings)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
-        json.dumps({"schema": "coastseg-lite.slopes/v1", "transects": result}, indent=2)
+        json.dumps(
+            {
+                "schema": "coastseg-lite.slopes/v1",
+                "settings": asdict(settings),
+                "transects": result,
+            },
+            indent=2,
+        )
         + "\n",
         encoding="utf-8",
     )
@@ -235,7 +243,7 @@ def build_parser() -> argparse.ArgumentParser:
     shoreline.add_argument("--georef", nargs=6, required=True, type=float)
     shoreline.add_argument("--pixel-size", required=True, type=float)
     shoreline.add_argument("--output", required=True, type=Path)
-    shoreline.add_argument("--min-beach-area-pixels", type=int, default=10)
+    shoreline.add_argument("--min-beach-area-m2", type=float, default=1000.0)
     shoreline.add_argument("--max-dist-ref", type=float, default=100.0)
     shoreline.add_argument("--min-length", type=float, default=200.0)
     shoreline.add_argument("--dist-clouds", type=float, default=300.0)

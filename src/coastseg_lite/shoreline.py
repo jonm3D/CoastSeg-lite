@@ -24,7 +24,7 @@ class ShorelineSettings:
     """Parameters retained from CoastSeg/CoastSat shoreline extraction."""
 
     water_classes: tuple[int, ...] = (0, 1)
-    min_beach_area_pixels: int = 10
+    min_beach_area_m2: float = 1000.0
     max_dist_ref_m: float = 100.0
     min_length_sl_m: float = 200.0
     dist_clouds_m: float = 300.0
@@ -53,6 +53,20 @@ def remove_small_objects_and_binarize(
     if min_size <= 1:
         return binary.copy()
     return morphology.remove_small_objects(binary, min_size=min_size, connectivity=2)
+
+
+def minimum_area_pixels(area_m2: float, georef: Sequence[float]) -> int:
+    """Convert a physical area threshold to source-grid pixels as in CoastSat."""
+
+    if not np.isfinite(area_m2) or area_m2 < 0:
+        raise ValueError("Minimum beach area must be finite and non-negative")
+    transform = np.asarray(georef, dtype=float)
+    if transform.shape != (6,):
+        raise ValueError("georef must contain six GDAL affine coefficients")
+    pixel_area_m2 = abs(transform[1] * transform[5] - transform[2] * transform[4])
+    if not np.isfinite(pixel_area_m2) or pixel_area_m2 <= 0:
+        raise ValueError("Shoreline grid must have a positive pixel area")
+    return int(np.ceil(area_m2 / pixel_area_m2))
 
 
 def pixel_to_world(points: np.ndarray, georef: Sequence[float]) -> np.ndarray:
@@ -218,7 +232,9 @@ def extract_shoreline(
     if not (labels.shape == cloud_mask.shape == nodata_mask.shape):
         raise ValueError("labels, cloud mask, and nodata mask must share a grid")
     water = merge_classes(labels, resolved.water_classes)
-    water = remove_small_objects_and_binarize(water, resolved.min_beach_area_pixels)
+    water = remove_small_objects_and_binarize(
+        water, minimum_area_pixels(resolved.min_beach_area_m2, georef)
+    )
     reference_buffer = create_shoreline_buffer(
         labels.shape,
         georef,
