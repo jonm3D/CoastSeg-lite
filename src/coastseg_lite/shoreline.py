@@ -27,7 +27,6 @@ class ShorelineSettings:
     min_beach_area_m2: float = 1000.0
     max_dist_ref_m: float = 100.0
     min_length_sl_m: float = 200.0
-    dist_clouds_m: float = 300.0
     dist_nodata_m: float = 30.0
 
 
@@ -198,12 +197,11 @@ def _remove_near_mask(
 
 def process_shoreline(
     contours: Iterable[np.ndarray],
-    cloud_mask: np.ndarray,
     nodata_mask: np.ndarray,
     georef: Sequence[float],
     settings: ShorelineSettings,
 ) -> np.ndarray:
-    """Convert, length-filter, and mask contours as in CoastSat."""
+    """Convert and length-filter contours, then clear no-data edges."""
 
     retained: list[np.ndarray] = []
     for contour in contours:
@@ -213,7 +211,6 @@ def process_shoreline(
     if not retained:
         return np.empty((0, 2), dtype=float)
     shoreline = np.concatenate(retained, axis=0)
-    shoreline = _remove_near_mask(shoreline, cloud_mask, georef, settings.dist_clouds_m)
     return _remove_near_mask(shoreline, nodata_mask, georef, settings.dist_nodata_m)
 
 
@@ -244,4 +241,4 @@ def extract_shoreline(
     )
     invalid = np.asarray(cloud_mask, dtype=bool) | np.asarray(nodata_mask, dtype=bool)
     contours = find_binary_contours(water, invalid, reference_buffer)
-    return process_shoreline(contours, cloud_mask, nodata_mask, georef, resolved)
+    return process_shoreline(contours, nodata_mask, georef, resolved)

@@ -46,7 +46,6 @@ def test_extract_vertical_binary_shoreline():
         min_beach_area_m2=1.0,
         max_dist_ref_m=2.0,
         min_length_sl_m=5.0,
-        dist_clouds_m=0.0,
         dist_nodata_m=0.0,
     )
     shoreline = extract_shoreline(
@@ -60,3 +59,27 @@ def test_extract_vertical_binary_shoreline():
     )
     assert len(shoreline) >= 8
     np.testing.assert_allclose(shoreline[:, 0], 4.5)
+
+
+def test_isolated_cloud_pixel_is_not_expanded_into_a_proximity_exclusion():
+    labels = np.full((40, 40), 2, dtype=np.uint8)
+    labels[:, 20:] = 0
+    clear = np.zeros_like(labels, dtype=bool)
+    cloud = clear.copy()
+    cloud[20, 10] = True
+    settings = ShorelineSettings(
+        min_beach_area_m2=1.0,
+        max_dist_ref_m=2.0,
+        min_length_sl_m=20.0,
+        dist_nodata_m=0.0,
+    )
+    reference = np.array([[19.5, 10.0], [19.5, -29.0]])
+
+    without_cloud = extract_shoreline(
+        labels, clear, clear, GEOREF, 1.0, reference, settings
+    )
+    with_cloud = extract_shoreline(
+        labels, cloud, clear, GEOREF, 1.0, reference, settings
+    )
+
+    np.testing.assert_allclose(with_cloud, without_cloud)

@@ -117,7 +117,6 @@ def _run_shoreline(args: argparse.Namespace) -> int:
         min_beach_area_m2=args.min_beach_area_m2,
         max_dist_ref_m=args.max_dist_ref,
         min_length_sl_m=args.min_length,
-        dist_clouds_m=args.dist_clouds,
         dist_nodata_m=args.dist_nodata,
     )
     shoreline = extract_shoreline(
@@ -246,7 +245,6 @@ def build_parser() -> argparse.ArgumentParser:
     shoreline.add_argument("--min-beach-area-m2", type=float, default=1000.0)
     shoreline.add_argument("--max-dist-ref", type=float, default=100.0)
     shoreline.add_argument("--min-length", type=float, default=200.0)
-    shoreline.add_argument("--dist-clouds", type=float, default=300.0)
     shoreline.add_argument("--dist-nodata", type=float, default=30.0)
     shoreline.set_defaults(run=_run_shoreline)
 
